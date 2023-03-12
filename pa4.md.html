@@ -1,0 +1,170 @@
+**CS211-A PA4: Computer Graphics**
+***Due date: Friday, March 17th by 11:59 pm***
+
+Introduction
+====================
+
+The objective of this assignment is to get familiar with the basic geometric transformations that are fundamental to creating any scene. You would need to write some code. It will take some time to understand every part, so **please start early**.
+
+**Software and hardware requirement**: WebGL runs within the browser and is independent of the operating and window systems. You may finish the assignment using any operating system you like (e.g. Windows, MacOS or Linux).
+
+**Programming language**: The assignment will be implemented in JavaScript. As we will minimize the use of obscure JavaScript language features, it should not be too difficult for anyone with prior experiences in dynamic languages like Python or familiar with the principles of Object Oriented Programming (like C++ or Java) to get a handle on JavaScript syntax by reading through some of the code in code skeleton. For more formal introductions to JavaScript, checkout the [references](#usefulreferences).
+
+
+Getting started with the code skeleton
+========================================
+
+In this assignment, you will be rendering a rotating cube using three different types of shading: no shading, Gouraud shading and Phong Shading. Furthermore, you will be implementing three kinds of illumination i.e. ambient, diffuse and specular.
+
+Download pa4.zip
+--------------------
+
+Download [pa4.zip](pa4.zip) and extract it any folder you like. You should have five files in the folder:
+    |file name|description|
+    |---|---|
+    |pa4.html           |HTML file which shows the WebGL canvas.|
+    |pa4.js             |functions used to draw the scene.|
+    |gl-matrix-min.js   |utility functions for operating matrices.|
+    |model.js          |file describing the models in IFS format.|
+    |trackball-rotator.js|utility functions for rotating the scene using the cursor.|
+
+Open pa4.html
+--------------------
+
+Open *pa4.html* in the extracted folder using your browser. You will see an error message right now as the vertex
+and fragment shaders are not implemented. The vertex and fragment shaders are responsible for drawing the
+scene.
+
+![](./pa4/pa4html.png width=512)
+
+Note
+--------------------
+
+- For this project, **you will be modifying two files *pa4.html* and *pa4.js***. But try to read and understand what other functions are doing as well as it would help you better implement things. There are lots of comments throughout the codebase and the functions have similar structure as programming assignment 1 for better/easy understanding.
+
+- Using the [`Shading Type`] dropdown, a user can select different shading models (None, Gouraud or Phong shading). Using the [`Lighting`] checkboxes, a user can toggle between different illumination types. A user can also adjust the [`Light Position`] and [`Specular Exponent`] used for computing specular highlights.
+
+TASKS
+========================================
+TASK 0 - PRELIMINARY INFORMATION
+----------
+### Task 0.1 - The Light Equation
+Before starting the project, you need to first know how to compute the light at a single point. Below is a schematic of a point on a surface which is being illuminated by a point light source where:
+ - $L$ = The direction of the light
+ - $N$ = Normal of the point on the surface
+ - $R$ = Reflection of $L$ about $N$
+ - $V$ = Viewing direction
+
+![](./pa4/phong.png width=512)
+
+- Light at a point = Ambient Light + Diffuse Light + Specular Light
+
+- Ambient Light = $K_a \times$ diffuse_color
+- Diffuse Light = $K_d \times$ diffuse_color $\times \max(N\cdot L, 0)$
+- Specular Light = $K_s \times$ specular_color $\times \max(R\cdot V, 0)^n$
+
+Use $K_a=0.1, K_d=0.8, K_s=0.4$.
+
+$n$ is the specular coefficient, which the user can change.
+
+Note, although the above light equation is not complete as it does not account for the distance from light source (light intensity decreases as we move away from the light source), to keep things simple we would only implement the above equation in this programming assignment.
+
+### Task 0.2 - Shaders and GLSL
+The next thing you need to know is what are Shaders. Shaders (Vertex, Fragment, etc) are small programs which are executed on the GPU. They are mainly responsible for determining the color of each object. However, they can be used for many different tasks. In this assignment we will be using two shaders namely *`vertex`* and *`fragment`* shaders to render of our scene.
+
+To write in any shader, you must first know the basics of GLSL. GLSL is a short term for OpenGL Shading Language. This is used to write code into any shader. It is similar to C/C++. Check out the references to understand more on how to write code in a shader.
+
+Once you are familiar with GLSL, you can start writing code in the vertex and fragment shader in *pa4.html*.
+
+![](./pa4/vertex_fragment_shader.png width=512)
+
+However, before writing, we recommend checking out the function **`initGL()`** in *pa4.js* to see what all variables you will be creating in the shaders. Note, you will be using some of these variables in the vertex shader and some in the fragment shader. Hence, it's important to understand:
+- What vertex and fragment shaders do.
+- What these variables are and what you can compute from them.
+
+![](./pa4/initGL.png width=512)
+
+### Task 0.3 - Lighting Types
+
+You will be implementing each of the lighting separately such that when the user checks ambient, diffuse or specular, only those lighting sources are being implemented. If everything works well, you should be getting results similar to the below images.
+
+![There is no light. Hence you see a black cube.](./pa4/cube1.png width=512) ![Cube with only ambient light. A dim, green colored cube is seen.](./pa4/cube2.png width=512)
+![Cube with ambient and diffuse lighting.](./pa4/cube3.png width=512) ![Cube with ambient, diffuse and specular lighting.](./pa4/cube4.png width=512)
+
+TASK 1 - NO SHADING
+----------
+
+Implement the vertex and fragment shader without any type of shading. Look for the shaders in *pa4.html* with the IDs: *vshader-source-none* and *fshader-source-none*. Once you have correctly implemented them, it should display your cube as a flat colored box. You won't be able to see any edges. Hold down the mouse to rotate the cube.
+
+![The green cube, without any lighting implemented.](./pa4/cubeNone.png width=356)
+
+TASK 2 - GOURAUD SHADING
+----------
+
+Implement the vertex and fragment shader in *pa4.html* in order to draw cube with Gouraud shading. Look for the shaders in *pa4.html* with the IDs: *vshader-source-gouraud* and *fshader-source-gouraud*. Once you have implemented them correctly, you should see the cube with some sides lit up and others dark depending on the light position and orientation of the cube. Ensure that the three lighting types, ambient, diffuse and specular, are correctly implemented based on the checkboxes.
+
+![The green cube, with Gouraud shading implemented.](./pa4/cubeGouraud.png width=356)
+
+TASK 3 - PHONG SHADING
+----------
+
+Implement the vertex and fragment shader in *pa4.html* in order to draw the cube with Phong shading. Look for the shaders in *pa4.html* with the IDs: *vshader-source-phong* and *fshader-source-phong*. Ensure that the three lighting types, ambient, diffuse and specular, are correctly implemented based on the checkboxes. Once you have implemented it correctly, the cube should be very similar to the one with Gouraud shading.
+
+![The green cube, with Phong shading implemented.](./pa4/cubePhong.png width=356)
+
+However, the most noticeable difference between Phong shading and Gouraud shading is with specular highlights. In the images below, the cubes are oriented the same way, but show their appearance with specular lighting only. Notice how Phong shading has much better highlights. Can you explain why?
+
+![The cube with Gouraud shading.](./pa4/cubeGouraudComparison.png width=300) ![The cube with Phong shading.](./pa4/cubePhongComparison.png width=300)
+
+TASK 4 - Rotate the cube
+----------
+
+Once you have implemented all the shadings correctly, proceed to rotating the cube around any axis. The cube should be rotating around any axis in an animation. You'll need to pay attention, as the user can still move the camera with the mouse, so the shading must look correct.
+
+
+BELLS AND WHISTLES
+----------
+Try adding different light positions and see if your shading works correctly.
+
+Try changing the intensities of the ambient, diffuse and specular lighting.
+
+Change the color of the cube! Or its size!
+
+What happens when the user changes the specular exponent value? Why is this happening? 
+
+
+Submission
+====================
+
+1. Make sure your name and ID is filled above the canvas in *pa4.html*.
+
+1. You will need to submit the following files on EEE Canvas in **a zip archive**, please DO NOT submit individual files.
+  - pa4.html
+  - pa4.js
+  - model.js
+  - gl-matrix-min.js
+  - trackball-rotator.js
+
+1. We will grade your work using Google Chrome by default. If your code requires a different browser to work properly, please clarify by including a *readme* file in your zip archive.
+
+
+Grading
+====================
+1. (30 pts) Your program should be able to correctly light up the cubes for the three different shaders
+
+2. (30 pts) Your program should be able to correctly light up the cubes for all the three lighting scenarios (ambient, diffuse, specular) in Gouraud and Phong shading. The user should be able to manipulate these scenarios using the lighting checkboxes.
+
+3. (40 pts) You should be successfully able to rotate the cube in an animation, with the correct lighting even if the user moves the camera around.
+
+
+Useful references
+====================
+
+- [WebGL](https://webglfundamentals.org)
+- [JavaScript 1](https://developer.mozilla.org/en-US/docs/Web/JavaScript), [JavaScript 2](https://google.github.io/styleguide/javascriptguide.xml?showone=Comments#Comments)
+- [glMatrix](http://glmatrix.net)
+- [WebGL Shaders and GLSL (GL Shading Language)](https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html)
+
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js" charset="utf-8"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

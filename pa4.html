@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+
+<head>
+<title>Programming Assignment 4</title>
+<style>
+    body {
+        background-color: #EEEEEE;
+    }
+    label {
+        white-space: pre;
+    }
+</style>
+
+<!-- vertex shader -->
+<script type="x-shader/x-vertex" id="vshader-source-none">
+
+    // TODO: Your code goes here.
+    // Vertex Shader computes the coordinates for all the vertices which are being drawn.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa2.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+
+</script>
+
+<!-- fragment shader -->
+<script type="x-shader/x-fragment" id="fshader-source-none">
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+       precision highp float;
+    #else
+       precision mediump float;
+    #endif
+
+    // TODO: Your code goes here.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa2.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+    // Use the diffuse_color to compute both ambient and diffuse lighting.
+    // Use the specular_color to compute the specular lighting.
+    // Use K_a = 0.1, K_d = 0.8, K_s = 0.4.
+
+</script>
+
+
+
+
+<!-- vertex shader -->
+<script type="x-shader/x-vertex" id="vshader-source-gouraud">
+    
+    // TODO: Your code goes here.
+    // Vertex Shader computes the coordinates for all the vertices which are being drawn.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa2.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+
+</script>
+
+<!-- fragment shader -->
+<script type="x-shader/x-fragment" id="fshader-source-gouraud">
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+       precision highp float;
+    #else
+       precision mediump float;
+    #endif
+
+    // TODO: Your code goes here.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa4.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+    // Use the diffuse_color to compute both ambient and diffuse lighting.
+    // Use the specular_color to compute the specular lighting.
+    // Use K_a = 0.1, K_d = 0.8, K_s = 0.4.
+
+</script>
+
+
+<!-- vertex shader -->
+<script type="x-shader/x-vertex" id="vshader-source-phong">
+
+    // TODO: Your code goes here.
+    // Vertex Shader computes the coordinates for all the vertices which are being drawn.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa4.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+
+</script>
+
+<!-- fragment shader -->
+<script type="x-shader/x-fragment" id="fshader-source-phong">
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+       precision highp float;
+    #else
+       precision mediump float;
+    #endif
+
+    // TODO: Your code goes here.
+    // Fragment Shader computes the color for those vertices.
+    // You can also pass variables from the vertex shader to the fragment shader.
+    // Look into the pa4.js and see what attributes and uniforms are being transferred to both the
+    // shaders. Write the code in both the shaders appropriately.
+    // Use the diffuse_color to compute both ambient and diffuse lighting.
+    // Use the specular_color to compute the specular lighting.
+    // Use K_a = 0.1, K_d = 0.8, K_s = 0.4.
+
+</script>
+
+<script src="gl-matrix-min.js"></script>
+<script src="trackball-rotator.js"></script>
+<script src="model.js"></script>
+<script src="pa4.js"></script>
+</head>
+
+
+<body onload="init()">
+Name: <br/>
+Student ID: <br/>
+
+ <p style="width:600px; text-align: left;">
+    <label><b>Shading Type:</b> <select id="shaderType">
+        <option value="0">None</option>
+        <option value="1">Gouraud</option>
+        <option value="2">Phong</option>
+    </select></label><br>
+
+    <label><b>Lighting:  </b></label>
+    <label><b>Ambient</b><input type="checkbox" id="ambient"></label>
+    <label><b>Diffuse</b><input type="checkbox" id="diffuse"></label>
+    <label><b>Specular</b><input type="checkbox" id="specular"></label><br/>
+
+    <label><b>Light Position:</b> <select id="lightpos">
+        <option value="0">[0,0,1,0] (Directional, into screen)</option>
+        <option value="1">[0,1,0,0] (Directional, from above)</option>
+        <option value="2">[0,0,-10,1] (On z-axis, close to object)</option>
+        <option value="3">[2,3,5,0] (Directional from upper right)</option>
+<!--    TODO: Your code goes here.
+        Add two more lights at different directions. One from the bottom and One
+        from the left of the scene. Appropriately change the pa4.js file so that when user
+        selects these new light positions, the scene gets updated.
+        */ -->
+    </select></label><br>
+
+    <label><b>Specular Exponent:</b> <select id="exponent">
+        <option>0</option>
+        <option>1</option>
+        <option>2</option>
+        <option>5</option>
+        <option>10</option>
+        <option>20</option>
+        <option>50</option>
+        <option>100</option>
+    </select></label>
+</p>
+
+<div id="canvas-holder">
+   <canvas width=700 height=700 id="myGLCanvas" style="background-color:red"></canvas>
+</div>
+
+</body>
+
+
+</html>
+
