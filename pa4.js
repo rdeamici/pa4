@@ -23,7 +23,7 @@ var u_specular
 
 var projection = mat4.create();    // projection matrix
 var modelview;                     // modelview matrix; value comes from rotator
-var modelMat;
+var modelMat = mat4.create();
 var normalMatrix = mat3.create();  // matrix, derived from modelview matrix, for transforming normal vectors
 var rotator;                       // A TrackballRotator to implement rotation by mouse.
 
@@ -38,7 +38,7 @@ var objects = [                     // Objects for display
     uvCube(2)
 ];
 
-var shaderProgramNames = ["none", "gouraud", "phong"];
+var shaderProgramNames = ["none"]; //, "gouraud", "phong"];
 var shaderPrograms = [];
 
 var currentModelNumber;             // contains data for the current object
@@ -48,12 +48,16 @@ var currentShaderType;
 function draw() { 
 
     GetUniforms(currentShaderType);
-
+    //  sets background color
     gl.clearColor(0.15,0.15,0.3,1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    mat4.perspective(projection,Math.PI/5,1,10,20);
+    // transforms 3D points to 2D points
+    // (fovY, aspect ratio, near clipping plane, far clipping plane)
+    mat4.perspective(projection, Math.PI/5, 1, 10, 20);
     
+    // get the view matrix
+    // transforms 3D pts of cube to the viewpoint coord system
     modelview = rotator.getViewMatrix();
     
     if (document.getElementById("ambient").checked) {
@@ -77,6 +81,8 @@ function draw() {
     /* Get the matrix for transforming normal vectors from the modelview matrix,
        and send matrices to the shader program*/   
     mat3.normalFromMat4(normalMatrix, modelview);
+
+    mat4.identity(modelMat);
     
     gl.uniformMatrix3fv(u_normalMatrix, false, normalMatrix);
     gl.uniformMatrix4fv(u_modelview, false, modelview );
@@ -96,6 +102,9 @@ function draw() {
 function installModel(modelData) {
      gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer);
      gl.bufferData(gl.ARRAY_BUFFER, modelData.vertexPositions, gl.STATIC_DRAW);
+     //              (location in GPU, size, type, normalized, stride, offset)
+     //                 size = # of components per attribute: 3 == (X,Y,Z)
+     //                   can ignore the last 3 - normalized, stride, offset
      gl.vertexAttribPointer(a_coords_loc, 3, gl.FLOAT, false, 0, 0);
      gl.enableVertexAttribArray(a_coords_loc);
      gl.bindBuffer(gl.ARRAY_BUFFER, a_normal_buffer);
@@ -114,6 +123,7 @@ function initGL() {
     for(i = 0; i < shaderProgramNames.length; i++) {
         var vertexShaderName = "vshader-source-" + shaderProgramNames[i];
         var fragmentShaderName = "fshader-source-" + shaderProgramNames[i];
+        console.log("createProgram with '"+vertexShaderName+"' and '"+fragmentShaderName+"'")
         prog = createProgram(gl, vertexShaderName, fragmentShaderName);
 
         gl.useProgram(prog);
@@ -178,23 +188,38 @@ function GetUniforms(shaderNumber) {
  * string contains the compilation or linking error.  If no error occurs,
  * the program identifier is the return value of the function.
  *    The second and third parameters are the id attributes for <script>
- * elementst that contain the source code for the vertex and fragment
+ * elements that contain the source code for the vertex and fragment
  * shaders.
  */
 function createProgram(gl, vertexShaderID, fragmentShaderID) {
-    function getTextContent( elementID ) {
-            // This nested function retrieves the text content of an
-            // element on the web page.  It is used here to get the shader
-            // source code from the script elements that contain it.
-        var element = document.getElementById(elementID);
-        var node = element.firstChild;
+    function getTextContent( shaderType ) {
+        // This nested function retrieves the shader source code
+        // from the string variables defined in shaders.js.
         var str = "";
-        while (node) {
-            if (node.nodeType == 3) // this is a text node
-                str += node.textContent;
-            node = node.nextSibling;
-        }
-        return str;
+        switch(shaderType) {
+            case 'vshader-source-none':
+                str = vshader_none;
+                break;
+            case 'fshader-source-none':
+                str = fshader_none;
+                break;
+            case 'vshader-source-gouraud':
+                str = vshader_gouraud;
+                break;
+            case 'fshader-source-gouraud':
+                str = fshader_gouraud;
+                break;
+            case 'vshader-source-phong':
+                str = vshader_phong;
+                break;
+            case 'fshader-source-phong':
+                str = fshader_phong;
+                break;
+            default:
+              // Handle invalid shader type
+                console.error(`Invalid shader type: ${shaderType}`);
+          }
+          return str;
     }
     try {
         var vertexShaderSource = getTextContent( vertexShaderID );
