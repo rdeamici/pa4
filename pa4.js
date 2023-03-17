@@ -38,7 +38,7 @@ var objects = [                     // Objects for display
     uvCube(2)
 ];
 
-var shaderProgramNames = ["none"]; //, "gouraud", "phong"];
+var shaderProgramNames = ["none", "gouraud"];//, "phong"];
 var shaderPrograms = [];
 
 var currentModelNumber;             // contains data for the current object
@@ -53,7 +53,7 @@ function draw() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // transforms 3D points to 2D points
-    // (fovY, aspect ratio, near clipping plane, far clipping plane)
+    // (projection, fovY, aspect ratio, nearClippingPlane, farClippingPlane)
     mat4.perspective(projection, Math.PI/5, 1, 10, 20);
     
     // get the view matrix
