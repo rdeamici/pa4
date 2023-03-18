@@ -30,6 +30,8 @@ var rotator;                       // A TrackballRotator to implement rotation b
 var lightPositions = [             // values for light position, selected by popup menu 
     [0,0,1,0], 
     [0,1,0,0], 
+    [0,0,-1,0], 
+    [0,-1,0,0], 
     [0,0,-10,1], 
     [2,3,5,0],
 ];
@@ -38,7 +40,7 @@ var objects = [                     // Objects for display
     uvCube(2)
 ];
 
-var shaderProgramNames = ["none", "gouraud"];//, "phong"];
+var shaderProgramNames = ["none", "gouraud", "phong"];
 var shaderPrograms = [];
 
 var currentModelNumber;             // contains data for the current object
