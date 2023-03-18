@@ -90,35 +90,28 @@ var vshader_gouraud = `
     uniform int diffuse;
     uniform int specular;
 
-    vec4 Ka = vec4(0.1, 0.1, 0.1, 1.0);
-    vec4 Kd = vec4(0.8, 0.8, 0.8, 1.0);
-    vec4 Ks = vec4(0.4, 0.4, 0.4, 1.0);
+    const float Ka = 0.1;
+    const float Kd = 0.8;
+    const float Ks = 0.4;
 
-    varying vec4 pixelColor;
+    varying vec3 pixelColor;
 
     void main(void) {        
-        gl_Position = projection * modelview * modelMat * vec4(a_coords,1.0);
-        vec4 Ia = vec4(0,0,0,1);
-        vec4 Id = vec4(0,0,0,1);
-        vec4 Is = vec4(0,0,0,1);
+        vec4 position = modelview * vec4(a_coords, 1.0);
+        vec4 lightPosTr = modelMat * lightPosition;
 
-        vec4 N = modelMat * vec4(a_normal, 1.0);
-        vec4 V = normalize(modelview * modelMat * vec4(a_coords,1.0));
-        vec4 R = reflect(lightPosition, N);
+        vec3 L = normalize(lightPosTr.xyz); // - position.xyz);
+        vec3 N = normalize(normalMatrix * a_normal);
+        vec3 V = normalize(-position.xyz);
+        vec3 R = reflect(-L, N);
 
-        if (ambient == 1) {
-            Ia = Ka * diffuseColor;
-        }
-        if (diffuse == 1) {
-            Id = Kd * diffuseColor * max(0.0, dot(N,lightPosition));            
-        }
-        if(specular == 1) {
-            // check if specularExponent is 0 and ensure no values to pow are 0^0, which is undefined in GLSL
-            Is = Ks * vec4(specularColor,1.0) * pow(max(0.0,dot(R,V)), specularExponent);
-        }
+        vec3 ambientPart = Ka * diffuseColor.xyz * float(ambient);
+        vec3 diffusePart = Kd * diffuseColor.xyz * max(dot(L,N), 0.0) * float(diffuse);
+        vec3 specularPart = Ks * specularColor * pow(max(dot(R, V),0.0), specularExponent) * float(specular);
 
-        pixelColor = Ia + Id + Is;
-        // pixelColor = vec4(0,0,0,3);
+        pixelColor = ambientPart + diffusePart + specularPart;
+        
+        gl_Position = projection * position;
 }`;
 
 var fshader_gouraud = `
@@ -130,11 +123,11 @@ var fshader_gouraud = `
     precision mediump float;
     #endif
 
-    varying vec4 pixelColor;
+    varying vec3 pixelColor;
 
     void main(void){
         
-        gl_FragColor = pixelColor;
+        gl_FragColor = normalize(vec4(pixelColor,1.0));
 }`;
 
 var vshader_phong = `
