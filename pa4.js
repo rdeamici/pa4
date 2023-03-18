@@ -24,6 +24,8 @@ var u_specular
 var projection = mat4.create();    // projection matrix
 var modelview;                     // modelview matrix; value comes from rotator
 var modelMat = mat4.create();
+var angle = Math.PI / 180; // specify the rotation angle in radians
+var axis = [0, 1, 0]; // specify the rotation axis (y-axis in this case)
 var normalMatrix = mat3.create();  // matrix, derived from modelview matrix, for transforming normal vectors
 var rotator;                       // A TrackballRotator to implement rotation by mouse.
 
@@ -65,7 +67,7 @@ function draw() {
     if (document.getElementById("ambient").checked) {
         gl.uniform1i(u_ambient, 1);
     }else{
-         gl.uniform1i(u_ambient, 0);
+        gl.uniform1i(u_ambient, 0);
     }
 
     if (document.getElementById("diffuse").checked) {
@@ -84,8 +86,6 @@ function draw() {
        and send matrices to the shader program*/   
     mat3.normalFromMat4(normalMatrix, modelview);
 
-    mat4.identity(modelMat);
-    
     gl.uniformMatrix3fv(u_normalMatrix, false, normalMatrix);
     gl.uniformMatrix4fv(u_modelview, false, modelview );
     gl.uniformMatrix4fv(u_modelMat, false, modelMat );
@@ -313,6 +313,13 @@ function init() {
     currentModelNumber = 0;
     currentShaderType = 0;
     rotator = new TrackballRotator(canvas, draw, 15);
-    draw();
+
+    function rotate(now) {
+        angle = 0.01; // rotate by a small amount
+        draw();
+        mat4.rotate(modelMat, modelMat, angle, axis);
+        requestAnimationFrame(rotate);
+      }
+      requestAnimationFrame(rotate);
 }
 

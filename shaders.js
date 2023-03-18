@@ -27,7 +27,7 @@ var vshader_none = `
     uniform int specular;
 
     void main(void) {
-        gl_Position = projection * modelview * vec4(a_coords,1.0);
+        gl_Position = projection * modelview * modelMat * vec4(a_coords,1.0);
     }`;
 
 
@@ -98,11 +98,11 @@ var vshader_gouraud = `
     varying vec3 pixelColor;
 
     void main(void) {        
-        vec4 position = modelview * vec4(a_coords, 1.0);
+        vec4 position = modelview * modelMat * vec4(a_coords, 1.0);
         vec4 lightPosTr = modelview * lightPosition;
 
         vec3 L = normalize(lightPosTr.xyz); // - position.xyz);
-        vec3 N = normalize(normalMatrix * a_normal);
+        vec3 N = normalize(normalMatrix * mat3(modelMat) * a_normal);
         vec3 V = normalize(-position.xyz);
         vec3 R = reflect(-L, N);
 
@@ -176,10 +176,10 @@ var vshader_phong = `
     varying vec3 v_normal;
 
     void main(void) {        
-        vec4 position = modelview * vec4(a_coords, 1.0);
+        vec4 position = modelview * modelMat * vec4(a_coords, 1.0);
         vec4 lightPosTr = modelview * lightPosition;
 
-        v_normal = normalize(normalMatrix * a_normal);
+        v_normal = normalize(normalMatrix * mat3(modelMat) * a_normal);
         v_coords = normalize(-position.xyz);
         gl_Position = projection * position;
     }`;
@@ -225,7 +225,7 @@ var fshader_phong = `
     void main(void){
 
         vec4 lightPosTr = modelview * lightPosition;
-        
+ 
         vec3 L = normalize(lightPosTr.xyz); // - position.xyz);
         vec3 N = normalize(v_normal);
         vec3 V = normalize(v_coords);
