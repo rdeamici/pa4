@@ -101,7 +101,7 @@ var vshader_gouraud = `
         vec4 position = modelview * modelMat * vec4(a_coords, 1.0);
         vec4 lightPosTr = modelview * lightPosition;
 
-        vec3 L = normalize(lightPosTr.xyz); // - position.xyz);
+        vec3 L = normalize(lightPosTr.xyz);
         vec3 N = normalize(normalMatrix * mat3(modelMat) * a_normal);
         vec3 V = normalize(-position.xyz);
         vec3 R = reflect(-L, N);

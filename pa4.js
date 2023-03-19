@@ -48,8 +48,30 @@ var shaderPrograms = [];
 var currentModelNumber;             // contains data for the current object
 var currentShaderType;
 
+var rotationDir;
+var rotationDirs = [
+    [0,1,0, 1], // rotate y -> rt
+    [0,1,0,-1], // rotate y -> rt
+    [1,0,0, 1], // rotate x -> top
+    [1,0,0,-1], // rotate x -> bottom
+    [0,0,1, 1], // rotate z -> front
+    [0,0,1,-1], // rotate z -> back
+];
+var rotateCube = 0;
+var r = 0;
+var g = 1;
+var b = 0;
+var alpha = 1;
 
-function draw() { 
+function rotate(now) {
+    draw();
+    mat4.rotate(modelMat, modelMat, angle, axis);
+    if (rotateCube) {
+        requestAnimationFrame(rotate);
+    }
+}
+
+function draw() {    
 
     GetUniforms(currentShaderType);
     //  sets background color
@@ -93,7 +115,6 @@ function draw() {
     
     /* Draw the model.  The data for the model was set up in installModel() */
     gl.drawElements(gl.TRIANGLES, objects[currentModelNumber].indices.length, gl.UNSIGNED_SHORT, 0);
-
 }
 
 
@@ -152,7 +173,7 @@ function initGL() {
         gl.uniform1i(u_diffuse, 0);
         gl.uniform1i(u_specular, 0 );
         gl.uniform3f(u_specularColor, 0.5, 0.5, 0.5);   
-        gl.uniform4f(u_diffuseColor, 0, 1, 0, 1);       
+        gl.uniform4f(u_diffuseColor, r, g, b, alpha);       
         gl.uniform1f(u_specularExponent, 10);  
         gl.uniform4f(u_lightPosition, 0, 0, 1, 0); 
 
@@ -182,6 +203,8 @@ function GetUniforms(shaderNumber) {
 
     val = Number(document.getElementById("exponent").value);
     gl.uniform1f(u_specularExponent, val);
+
+    gl.uniform4f(u_diffuseColor, r,g,b,alpha);
 }
 
 /* Creates a program for use in the WebGL context gl, and returns the
@@ -309,17 +332,40 @@ function init() {
         draw();
     };
 
+    document.getElementById("rotationDir").onchange = function() {
+        rotationDir = Number(this.value);
+        axis = rotationDirs[rotationDir].slice(0,3);
+        angle = 0.01*rotationDirs[rotationDir][3];
+        draw();
+    };
+    
+    document.getElementById("rotate").onchange = function() {
+        rotateCube = document.getElementById("rotate").checked;
+        if (rotateCube) {
+            requestAnimationFrame(rotate);
+        }
+    }
+
+    document.getElementById("diffuseColor").onchange  = function() {
+        r = parseInt(this.value.substring(1, 3), 16) / 255;
+        g = parseInt(this.value.substring(3, 5), 16) / 255;
+        b = parseInt(this.value.substring(5, 7), 16) / 255;
+        draw();
+    }
+
     installModel(objects[0]);
     currentModelNumber = 0;
     currentShaderType = 0;
     rotator = new TrackballRotator(canvas, draw, 15);
+    rotationDir = 0;
+    axis = rotationDirs[rotationDir].slice(0,3);
+    angle = 0.01 * rotationDirs[rotationDir][3];
 
-    function rotate(now) {
-        angle = 0.01; // rotate by a small amount
-        draw();
-        mat4.rotate(modelMat, modelMat, angle, axis);
-        requestAnimationFrame(rotate);
-      }
-      requestAnimationFrame(rotate);
+    console.log("axis:");
+    console.log(axis);
+    console.log("angle:");
+    console.log(angle);
+
+    draw();
 }
 
